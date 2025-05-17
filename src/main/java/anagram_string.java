@@ -6,7 +6,7 @@ public class anagram_string {
         if(sort(A).equals(sort(B))){
             System.out.println("String is anagram");
         }else{
-            System.out.println("String is not an anagram");
+            System.out.println("String is not an anagram..");
         }
 
     }
@@ -31,6 +31,7 @@ public class anagram_string {
             newstr=newstr+arr[i];
         }
         return newstr;
+
     }
 
 }
