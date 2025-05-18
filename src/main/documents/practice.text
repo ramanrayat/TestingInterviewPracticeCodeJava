@@ -1,0 +1,1057 @@
+//invalidCertificateException
+//how to handle browser notification during automation
+//stale element exception
+//captha handling in selenium
+//data store
+//outh2 vs oauth1
+//authentication in rest assured
+
+Severity refers to the impact a bug has on the application’s functionality.
+Priority refers to the urgency with which the bug needs to be fixed.
+
+1. High Severity, High Priority : The application crashes when a user clicks the “Submit” button on a payment form.
+2. High Severity, Low Priority  : The application crashes when a rare feature (accessible by admins only once a year) is used.
+3. Low Severity, High Priority  : A typo in the company’s name on the homepage or a broken logo.
+4. Low Severity, Low Priority   : The alignment of text in a user profile page is slightly off on a specific browser version.
+
+----------------
+
+
+
+----------------------------------------------------------------------------------------------
+create a class and implements ITestListner and override all the neccessary methods like (onTestSuccess,onTestFailureon,TestSkipped,onStart,onFinish)
+
+testng.xml file
+
+<suite name="Suite">
+<listeners>
+<listener class-name="com.javatpoint.Listener"/>
+</listeners>
+<test name="Listeners_program">
+<classes>
+<class name="com.javatpoint.Testcases"></class>
+</classes>
+</test>
+</suite>
+
+
+----------------------------------------------------------------------------------------------
+
+Broken links
+
+List<Element> links = driver.findElements(By.tagName("a"));
+
+for(int i=0;i<links.size();i++){
+WebElement e1 = links.get(0);
+String s = e1.getAttributes("href")
+verifyUrl(s)
+
+}
+Url url = new Url(url);
+HttpUrlConnection httpconnection = (HttpUrlConnection) url.connection()
+
+----------------------------------------------------------------------------------------------
+
+IRetryAnalyzer
+
+rerum failled test cases multiple times
+
+public class Retry implements IRetryAnalyzer {
+    private int count = 0;
+    private static int maxTry = 3;
+    @Override
+    public boolean retry(ITestResult iTestResult) {
+        if (!iTestResult.isSuccess()) {                      //Check if test not succeed
+            if (count < maxTry) {                            //Check if maxtry count is reached
+                count++;                                     //Increase the maxTry count by 1
+                iTestResult.setStatus(ITestResult.FAILURE);  //Mark test as failed
+                return true;                                 //Tells TestNG to re-run the test
+            } else {
+                iTestResult.setStatus(ITestResult.FAILURE);  //If maxCount reached,test marked as failed
+            }
+        } else {
+            iTestResult.setStatus(ITestResult.SUCCESS);      //If test passes, TestNG marks it as passed
+        }
+        return false;
+    }
+
+
+@Test(retryAnalyzer = Retry.class)
+    public void test1() {
+        //Negative Scenario
+        assertEquals(2+2,5,"Addition Problem! 2+2 must be 4!\n");
+    }
+
+
+-----only execute failed test case.....
+
+need to implement logic in TestListener’s onTestFailure method.
+
+private static       int count  = 0;
+private final static int maxTry = 1;
+public void onTestFailure(ITestResult iTestResult) {
+    System.out.println("I am in onTestFailure method " +  getTestMethodName(iTestResult) + " failed")
+    if (count < maxTry) {
+        count++;
+        TestNG tng = new TestNG();
+        tng.setDefaultTestName("RETRY TEST");
+        Class[] classes1 = { iTestResult.getTestClass().getRealClass() };
+        tng.setTestClasses(classes1);
+        tng.addListener(new TestListener());
+        tng.run();
+    }
+}
+
+
+----------------------------------------------------------------------------------------------
+
+Query param :https://demoqa.com/BookStore/v1/Book?ISBN=9781449337711
+Path param  :https://demoqa.com/Account/v1/User/c589fd76-fe61-42ca-ba71-00d1ad296122
+
+Path parameters limit a request to one individual resource. They help you to retrieve, update, or delete information about a specific entity.
+Query : sorting and filtering followed by ?
+
+
+Validate Schema
+
+file - schema.json
+
+@Test
+   public void validateJSONSchema(){
+
+
+      RestAssured.baseURI = "https://jsonplaceholder.typicode.com/posts/2";
+
+      given().when().get().then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(new File("/Users/src/Parameterize/schema.json")));
+   }
+}
+
+
+----------------------------------------------------------------------------------------------
+@Test(group={"smokeTest"})
+
+<groups>
+    <run>
+	<include name ="smokeTest"></include>
+    <run>
+<groups>
+
+
+
+
+----------------------------------------------------------------------------------------------
+
+POJO (plain old java object)
+
+1. identify variable for pojo class
+2, create a variable in pojo class
+3. add a getter and setter method method for each variable in class
+{
+"name": "raman";
+age: 35;
+designation:"engineer"
+}
+
+public class employee{
+
+Private String name;
+Private int age;
+Private String designation;
+
+public String getName(){
+return name;
+}
+
+public int setName(String name)
+this.name = name;
+}
+
+usage of above class is any number of object can be created for above class and can be converted into json data and then json can back coverted into object
+its called serialization and desiarailization
+
+serialization -> convert employee class object to json object
+desrialization -> covert json object into class object
+
+
+in a class
+Employee e1 = new Employee();
+e1.name("raman")
+e1.age(35)
+
+ObjectMapper obj = new ObjectMapper();
+String employeeJson = obj.writeValueAsString(e1);
+
+RequestSpecification reqspec = RestAssured.given();
+reqspec.baseUri("http://bin.org/post");
+reqspec.body(employeeJson)
+
+Response res = reqspec.post();
+
+Desiarlization ......
+
+Employee e2 = objectMapper.readValue(employeeJson,Employee.class)
+sout(ew2.getName("name"));
+
+
+
+
+----------------------------------------------------------------------------------------------
+
+given().auth().basic("your username", "your password").get("your end point URL");
+given().auth().preemptive().basic("your username", "your password").get("your end point URL");
+given().auth().form("your username", "your password", new FormAuthConfig("/perform_signIn","user","password"))
+given().auth().oauth2("Access token").get("your end point URL")
+
+given().headers("Authorization","Bearer " + bearerToken,"Content-Type",ContentType.JSON,"Accept",ContentType.JSON).when().get(url)
+
+----------------------------------------------------------------------------------------------
+
+find broken link
+
+
+1) public static void main(String[] args) {
+System.setProperty("webdriver.chrome.driver", "D:/chromedriver.exe");
+WebDriver driver = new ChromeDriver();
+
+driver.get("https://bstackdemo.com/");
+List<WebElement> links = driver.findElements(By.tagName("a"));
+
+for (WebElement link : links) {
+String url = link.getAttribute("href");
+verifyLink(url);
+}
+
+
+
+2) public static void verifyLink(String url) {
+try {
+URL link = new URL(url);
+HttpURLConnection httpURLConnection = (HttpURLConnection) link.openConnection();
+httpURLConnection.setConnectTimeout(3000); // Set connection timeout to 3 seconds
+httpURLConnection.connect();
+
+
+if (httpURLConnection.getResponseCode() == 200) {
+System.out.println(url + " - " + httpURLConnection.getResponseMessage());
+} else {
+System.out.println(url + " - " + httpURLConnection.getResponseMessage() + " - " + "is a broken link");
+}
+} catch (Exception e) {
+System.out.println(url + " - " + "is a broken link");
+}
+}
+}
+
+----------------------------------------------------------------------------------------------
+
+Static variable and method
+
+interview questions : https://www.scientecheasy.com/2021/10/java-static-interview-questions.html/
+
+
+public class testclass1 {
+
+    static int value=1;
+    int value1=1;
+
+    testclass1() {
+
+        m1();
+        m2();
+    }
+    void m1() {
+        System.out.println(value);
+        System.out.println(value1);
+        System.out.println("Instance method");
+        m2();
+
+    }
+    static void m2() {
+
+        System.out.println(value);
+        System.out.println("Static method");
+        System.out.println(value1); //Non-static field 'value1' cannot be referenced from a static context
+        m1();  //will not work (Non-static method 'm1()' cannot be referenced from a static context)
+
+
+    }
+
+    public static void main(String[] args) {
+        new testclass1();
+
+    }
+}
+
+-------------------------------------------------------------------------------------------------
+
+
+
+###############################################
+
+for(String windows: driver.getWindowhandles())
+{
+driver.switchTo.window(handle)
+
+}
+
+driver.switchTo().frame(id)
+
+driver.navigate().refresh();
+driver.navigate().back();
+driver.navigate().forward();
+driver.manage().deleteAllCookies();
+
+
+###############################################
+
+Action action = new Action(Driver);
+WebElement element = driver.findelement(By.xpath());
+action.doubleClick(elment).build().perform();
+
+action.moveToElement().build.perform();
+
+###############################################
+
+overriding in selenium
+wait method can be use for minute and seconds both
+
+overriding in selenium
+
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.WebDriver;
+
+public class CustomWebDriver extends RemoteWebDriver {
+
+    public CustomWebDriver(URL remoteAddress, DesiredCapabilities capabilities) {
+        super(remoteAddress, capabilities);
+    }
+
+    @Override
+    public void get(String url) {
+        System.out.println("Navigating to: " + url);
+        super.get(url); // Call the superclass method
+    }
+}
+
+###############################################
+
+Surefire plugin anf failsafe plugin to run parllel test in cucumber
+
+###############################################
+
+#1 file upload scenario
+
+upload file using restassured
+File file = new File("/path/to/your/file.txt");
+Response response = given().multiPart("file", file, "text/plain").multiPart("fileName", "userdata").multiPart("description", "description").when ().post ( "/uploadFile").then().statusCode(200).log().all();
+
+#2 Retrive data from array json - POST call
+
+import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+
+public class api1stDay {
+    public static void main(String[] args) {
+
+        Response res = RestAssured.given().contentType("application/json").when().get("https://reqres.in/api/users?page=2").then().extract().response();
+        JsonPath jsn = new JsonPath(res.asString());
+        int size = jsn.getList("data").size();
+
+        for(int i=0;i<size;i++){
+            System.out.println(jsn.get("data["+i+"].email").toString());
+        }
+    }
+}
+
+#3 Hamcrest Matchers Assertions
+import static org.hamcrest.Matchers.equalTo;
+
+RestAssured.given().contentType(ContentType.JSON).when().get(endpoint).then().body("totalprice", equalTo(164));
+RestAssured.given().contentType(ContentType.JSON).when().get(endpoint).then().body("totalprice",greaterThan(100));
+RestAssured.given().contentType(ContentType.JSON).when().get(endpoint).then().body("totalprice",greaterThanOrEqualTo(50));
+RestAssured.given().contentType(ContentType.JSON).when().get(endpoint).then().body("totalprice",lessThan(1000));
+RestAssured.given().contentType(ContentType.JSON).when().get(endpoint).then().body("totalprice",lessThanOrEqualTo(1000));
+.body("firstname",equalTo("Mary"))
+.body("firstname",containsString("Mary")
+.body("firstname",startsWith("M"))
+body("firstname",endsWith("y")
+
+https://qaautomation.expert/2023/10/15/assertion-of-json-in-rest-assured-using-hamcrest/
+
+###############################################
+
+Factory design patteren
+
+public class BrowserFactory {
+
+	private static Map<String, WebDriver> drivers = new HashMap<String, WebDriver>();
+
+	/*
+	 * Factory method for getting browsers
+	 */
+	public static WebDriver getBrowser(String browserName) {
+		WebDriver driver = null;
+
+		switch (browserName) {
+		case "Firefox":
+			driver = drivers.get("Firefox");
+			if (driver == null) {
+				driver = new FirefoxDriver();
+				drivers.put("Firefox", driver);
+			}
+			break;
+		case "IE":
+			driver = drivers.get("IE");
+			if (driver == null) {
+				System.setProperty("webdriver.ie.driver",
+						"C:\\Users\\abc\\Desktop\\Server\\IEDriverServer.exe");
+				driver = new InternetExplorerDriver();
+				drivers.put("IE", driver);
+			}
+			break;
+		case "Chrome":
+			driver = drivers.get("Chrome");
+			if (driver == null) {
+				System.setProperty("webdriver.chrome.driver",
+						"C:\\Users\\abc\\Desktop\\Server\\ChromeDriver.exe");
+				driver = new ChromeDriver();
+				drivers.put("Chrome", driver);
+			}
+			break;
+		}
+		return driver;
+	}
+}
+
+
+To access
+
+WebDriver driver = BrowserFactory.getBrowser("Firefox");
+driver.get("https://toolsqa.com");
+
+//Test that both the browsers are actually only one instance of firefox driver
+WebDriver driver1 = BrowserFactory.getBrowser("Firefox");
+
+
+###############################################
+
+Challanges in selenium
+
+1- Only web support  -> No support for mobile or api
+2- Very limited support for image comparison or testing
+db4- No builin reporting tool
+5- Flaky test (might be because of implicit wait)- use explicit wait
+6- Dynamic web content -> can be handlle using explicit wait
+7- Window bases popup (non browser)-> file downloaded/allow camera.mic access    -> can be handle using autoID and robot
+8- page scrolling - need to use java script executor for this
+9- Image comparison testing - sikuli is an alternative
+
+###############################################
+
+Captha in seleniium
+
+In case you are using reCAPTCHA v2, you can put the Site Key and Secret Key also known as the test keys. These keys help in bypassing the CAPTCHA verification request and as a result, your automation case can run seamlessly.
+
+Site Key: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+Secret Key: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
+
+In the case of reCAPTCHA v3, the user needs to create their own keys for testing environments. Unlike reCAPTCHA v2, where the same keys are used for multiple environments, reCAPTCHA v3 enables the users to create separate keys for separate testing environments.
+
+using explicit wait: -
+
+WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(25));
+wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(By.xpath("//iframe[starts-with(@name, 'a-') and starts-with(@src, 'https://www.google.com/recaptcha')]")));
+wait.until(ExpectedConditions.elementToBeClickable( By.xpath("//div[@class='recaptcha-checkbox-border']"))).click();
+
+
+alertIsPresent()
+elementSelectionStateToBe()
+elementToBeClickable()
+elementToBeSelected()
+invisibilityOfTheElementLocated()
+presenceOfAllElementsLocatedBy()
+presenceOfElementLocated()
+textToBePresentInElement()
+titleIs()
+titleContains()
+visibilityOf()
+visibilityOfAllElements()
+
+JavaScriptExecutor js = JavaScriptExecutor(driver);
+
+
+
+
+###############################################
+
+enter value without using sendkeys
+
+jse.executeScript("document.getElementById(‘email').value=“abc.efg@xyz.com”);
+
+###############################################
+
+handling Authentication Popup
+WebDriverWait wait = new WebDriverWait(driver, 10);
+Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+alert.authenticateUsing(new UserAndPassword(<username>, <password>));
+
+###############################################
+
+TestNG supports three types of listeners:
+
+Test listeners: It listens to the test execution and allows us to perform actions before or after a test case is executed.
+
+Suite listeners: It listens to the suite execution and allows us to perform actions before or after the suite is executed.
+
+Method listeners: It listens to the execution of individual test methods and allows us to perform actions before or after a test method is executed.
+
+###############################################
+
+
+data provider
+
+
+using data provider
+
+    @Test(dataProvider="TestData")
+
+    @DataProvider(name="TestData")
+    public Object[][] getDataFromDataprovider(){
+    return new Object[][]
+    	{
+            { "Guru99", "India" },
+            { "Krishna", "UK" },
+            { "Bhupesh", "USA" }
+        };
+
+
+}
+}
+
+
+###############################################
+
+@Parameters({"author","searchKey"})
+
+<suite name="TestSuite">
+<parameter name="author" value="Guru99" />
+
+###############################################
+
+JS execute
+
+JavaScriptExecutor JS = (JavaScriptExecutor)driver
+JS.executeScript("window.scrollBy(0,1000)")
+
+document.getElementByID
+document.getElementByClassName
+document.getElementByName
+document.getElementByTagName
+
+###############################################
+
+Selenium
+
+java -jar selenium-server-standalone-2.30.0.jar -role hub
+
+java -Dwebdriver.gecko.driver="C:\geckodriver.exe" -jar selenium-server-standalone-3.4.0.jar -role webdriver -hub http://192.168.1.3:4444/grid/register -port 5566
+
+
+
+###############################################
+
+NoSuchElementException
+NoSuchWindowException
+NoSuchFrameException
+NoAlertPresentException
+SessionNotFoundException
+TimoutException
+StaleelementException
+ElementnNotVisibleException
+ElementNotSelectableException
+invalidSelectorException
+
+
+
+
+###############################################
+
+
+Bubble sort
+
+
+##########################################################
+
+
+
+
+Step 1: First get the entire HTML table and store this in a variable ‘htmltable’ of type web element.
+
+Step 2: Get all the rows with tag name ‘tr’ and store all the elements in a list of web elements. Now all the elements with tag ‘tr’ are stored in ‘rows’ list.
+
+Step 3: Loop through each row and get the list of elements with tag ‘th’. ‘rows.get(0)’ will give first row and ‘findElements(By.tagName(“th”))’ will give list of columns for the row.
+
+Step 4: Iterate using ‘columns.getsize()’ and get the details of each cell.
+
+
+
+
+###########################################################
+InputStream input = new FileInputStream("path/to/config.properties")
+Properties prop = new Properties();
+prop.load(input);
+System.out.println(prop.getProperty("db.url"));
+
+
+OutputStream output = new FileOutputStream("path/to/config.properties")
+Properties prop = new Properties();
+prop.setProperty("db.url", "localhost");
+prop.store(output, null);
+
+
+
+
+
+##############################################################
+
+RestAssured.BaseUri = "";
+RequestSpecification httpRequest = RestAssured.given();
+Response response  = httpRequest.request(Method.Get,"Base Path")
+
+
+RestAssured.baseURI = "";
+RestAssured.basePath = "";
+
+Get
+Response response =(Response) given().when().get().body();
+response.asString();
+
+-----------------------------------------------------------------------
+Post
+HashMap<INTEGER,INTEGER> payload = new HashMap<INTEGER,INTEGER>();
+Payload.put("name","raman");
+
+given().contentType(application/json).body(payload).when().post().then().statusCode(201).log().all();
+
+Object obj = new JSONParser.parse(new FileReader("file"))
+JsonObject jsonobj = (JsonObject)obj;
+jsonobj.get("");
+
+JsonArray jsonarray = jsonobj.getAsJsonArray("data");
+jsonarray.get(0).getAsJsonObejct.get("name");
+
+
+
+###################################################################
+
+import java.sql.*;
+
+Connection con = DriverManger.getConnection("");
+Statment stmt = con.createStatement();
+ResultSet rs = stmt.executeQuery("");
+while (rs.next()){
+rs.getInt(i)}
+
+
+################################################################
+
+-> driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+
+-> WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(30));
+Wait.untill(ExpectedConditions.visibilityOfElementLocated(By.xpath("")))
+
+
+-> Wait wait = new FluentWait(Wendriver refrence)
+.withTimeout(timeout,SECONDS)
+.pollingEvery(timeout,SECONDS)
+
+Wait.untill
+
+
+
+################################################################
+
+java -jar jenkins.war
+
+
+#################################################################
+
+Maven Execution Commands
+mvn clean verify -Dtest=ReprocessArticle.java -Ddata=live -Denv=qa
+#################################################################
+
+
+File ssFile = ((TakesScreenshot)(driver)).getScreenshotAs(OutputType.FILE);
+FileUtils.copy(ssFile,"");
+
+##################
+CSV file reader or normal file read code
+
+
+https://www.javatpoint.com/how-to-read-csv-file-in-java
+
+
+
+import java.io.*;
+import java.util.Scanner;
+public class ReadCSVExample1
+{
+public static void main(String[] args) throws Exception
+{
+
+Scanner sc = new Scanner(new File("F:\\CSVDemo.csv"));
+sc.useDelimiter(",");   //sets the delimiter pattern
+while (sc.hasNext())  //returns a boolean value
+{
+System.out.print(sc.next());  //find and returns the next complete token from this scanner
+}
+sc.close();  //closes the scanner
+}
+}
+
+
+##################
+
+Stale element exception
+
+StaleElementReferenceException can be avoided by using some workarounds
+like refreshing the webpage before accessing the web element,
+using the try-catch block,
+using explicit wait(wait for the expected condition or wait for the refresh of DOM), or using POM.
+
+
+##################
+
+Which wait ??????
+
+NoSuchElementException occurs, when the locators (i.e. id / xpath/ css selectors) is unable to
+find the web element on the web page.
+
+The reasons for this could be :
+
+Incorrect Locator
+
+Web element not available on web page
+
+In order to avoid this exception, we can use Fluent Wait. This wait allows us to define max timeout, polling frequency and define
+which exception to ignore.
+s
+-----------------------------------
+
+InputStream inputStream = new FileInputStream(new File("src/main/resources/customer.yaml"));
+Yaml yaml = new Yaml();
+Map<String, Object> data = yaml.load(inputStream);
+System.out.println(data);
+
+Access specifiers in Java
+
+public: field, method, class is accessible from anywhere.
+protected: field and method can be accessed from the same class to where they belong or from subclasses, and from same package class, but not from outside.
+default: field, method, the class can be accessed from the same package only and not from outside of the native package.
+private: field, the method can be accessed from the same class to where they belong.
+
+
+-----------------------------------------------------------------------------------------------
+
+Q10. Difference between final, finally and finalize keyword
+
+Final: If any restriction is required for classes, variables, or methods, the final keyword comes in handy. Inheritance of a final class and overriding of a final method is restricted by the use of the final keyword
+
+Finally: It is the block present in a program where all the codes written inside it get executed irrespective of handling of exceptions.
+
+Finalize: Prior to the garbage collection of an object, the finalize method is called so that the clean-up activity is implemented.
+
+Can the static methods be overridden? : No!  Overriding or dynamic polymorphism occurs during the runtime, but the static methods are loaded and looked up at the compile time statically.
+
+-----------------------------------------------------------------------------------------------
+
+Programing Que
+https://docs.google.com/document/d/1FiW-tLNTzqixCHJhRWqFsSZ8vkMfxaUqDZ079DkpfKU/edit?usp=sharing
+
+-----------------------------------------------------------------------------------------------
+
+Wrapper class : All primitive data types in Java have a class associated with them – known as wrapper classes. They’re known as wrapper classes because they ‘wrap’ the primitive data type into an object for the class. In short, they convert Java primitives into objects.
+
+-----------------------------------------------------------------------------------------------
+
+Singletone class : A singleton class in java can have only one instance and hence all its methods and variables belong to just one instance. Singleton class concept is useful for the situations when there is a need to limit the number of objects for a class.
+
+
+-------------------------------------------------------------------------------------------
+
+Extent Report implementation
+
+ExtentReports reports = new ExtentReports("Path of directory to store the resultant HTML file", true/false);
+ExtentTest test = reports.startTest("TestName");
+
+reports.endTest();
+test.log(LogStatus.PASS,"Test Passed");
+test.log(LogStatus.FAIL,"Test Failed");
+test.log(LogStatus.SKIP,"Test Skipped");
+test.log(LogStatus.INFO,"Test Info");
+
+Base Class methods = dropdown, time, loading configuration, screenshot, javascript action, action class click, frame switching
+
+####################################################################
+-----------------------------------------------------------------------------------------------
+
+OOPS in Selenium
+
+Inheritance : In a typical Page Object Model, we create a Base Class where we initialize WebDriver interface,
+Data Source, Excel Reader, Property File or Config File, WebDriver waits and so on. We extend the
+Base Class in our Test Class and Utility Class.
+
+Encapsulation: In a POM Project, we know that we create a separate class for every page.
+All these classes are the best examples of Encapsulation where we keep the data of a class separated from
+the other class.In these POM Classes, we declare the data members using @FindBy and
+initialize them using a constructor with initElement() to utilize them in the test methods.
+
+Polymorphism:
+Method overloading = waits in selenium, dropdown (select by index, select by visible text, )
+Method Overriding  = override get method of remote driver by printing browser name in beginning of test
+
+Overriding
+import org.openqa. Selenium.remote.RemoteWebDriver;
+public class Over extends RemoteWebDriver {
+    @Override
+    public void get(String url) {
+        System.out.println("Navigating to URL: " + url);
+        super.get(url);
+    }
+}
+
+-----------------------------------------------------------------------------------------------
+SingleTon Class
+
+The primary purpose of a java Singleton class is to restrict the limit of the number of object creations to only one. This often ensures that there is access control to resources, for example, socket or database connection.
+
+1) Make a constructor private.
+2) Write a static method that has the return type object of this singleton class. Here, the concept of Lazy initialization is used to write this static method.
+
+For example, there is a license with us, and we have only one database connection or suppose our JDBC driver does not allow us to do multithreading, then the Singleton class comes into the picture and makes sure that at a time, only a single connection or a single thread can access the connection.
+
+
+
+public class jdbcConnection{
+
+private static jdbcconnection jdbc;
+
+private jdbcConnection{}
+
+public static jdbcConnection getInstance(){
+
+if(jdbc ==null){
+jdbc = new jdbcConnection();
+}
+
+return jdbc;
+}
+
+
+}
+
+-----------------------------------------------------------------------------------------------
+Constructor
+
+-A constructor in Java can not be abstract, final, static(becauswe construtor for object not class like static ) , or Synchronized.
+-Access modifiers can be used in constructor declaration to control its access
+-return type to a constructor, it will function as a general method. But, the compiler will display a warning message, "This method has a Constructor name".
+-The protected constructor can only be accessed by using a super keyword according to Java language standards.
+
+1.Default Constructor in Java
+2.Parameterized Constructor in Java
+3.Copy Constructor in Java
+
+ Geek(String name, int id)
+    {
+        this.name = name;
+        this.id = id;
+    }
+
+    // Copy Constructor
+    Geek(Geek obj2)
+    {
+        this.name = obj2.name;
+        this.id = obj2.id;
+    }
+}
+-----------------------------------------------------------------------------------------------
+
+HashMap iteration
+
+#1
+
+for (String name : hm.keySet())
+            System.out.println("key: " + name);
+
+for (String url : hm.values())
+            System.out.println("value: " + url);
+
+
+#2
+
+for (Map.Entry<String,String> entry : gfg.entrySet())
+System.out.println("Key = " + entry.getKey() +", Value = " + entry.getValue());
+
+
+#3 using lambda
+
+gfg.forEach((k,v) -> System.out.println("Key = "+ k + ", Value = " + v));
+
+
+
+
+-----------------------------------------------------------------------------------------------
+
+
+Cucumber
+
+1) TestRunner.java
+
+
+@RunWith(cucumber.class)
+@cucumberOptions(){
+features="",glue={""}
+}
+public class TestRunner(){
+}
+
+2) login.feature
+
+Feature: test to login functioanlity
+description------
+
+Sceanrio: Given user is navigated to webpage
+		    When enter the <username> and <password> in input fields
+		    Then user is able to login into page
+
+
+3) loginSteps.java
+
+public class navigateToWebpage() {
+
+Webdriver driver = new ChromeDriver();
+
+@Given("^user is navigated to webpage$")
+public void user_navigate_to_webpage(){
+
+driver.get("www.gmail.com")
+
+}
+
+@When("enter the "username" and "password" in input fields")
+public void enter_user_details(String name,String password){
+
+driver.findElement(By.xpath("")).sendKeys("ramanrayat");
+driver.findElement(By.xpath("")).sendKeys("password");
+driver.findElement(By.xpath("")).click();
+}
+
+}
+
+-----------------------------------------------------------------------------------------------
+
+How to implement Encapsulation : Getter Setter
+
+-----------------------------------------------------------------------------------------------
+
+aggregation in java : In Java, aggregation represents HAS-A relationship, which means when a class contains reference of another class known to have aggregation
+
+-----------------------------------------------------------------------------------------------
+
+IS-A relationship and HAS-A relationship in Java : An Is-A relationship is also known as inheritance and a Has-A relationship is also known as composition in Java.
+
+-----------------------------------------------------------------------------------------------
+
+
+
+
+FileInputStream fs = new FileInputStream("D:\\DemoFile.xlsx");
+//Creating a workbook
+XSSFWorkbook workbook = new XSSFWorkbook(fs);
+XSSFSheet sheet = workbook.getSheetAt(0);
+Row row = sheet.getRow(0);
+Cell cell = row.getCell(0);
+System.out.println(sheet.getRow(0).getCell(0));
+
+
+Loop
+
+
+// Read excel
+FileInputStream file = new FileInputStream(new File("howtodoinjava_demo.xlsx"));
+XSSFWorkbook workbook = new XSSFWorkbook(file);
+XSSFSheet sheet = workbook.getSheetAt(0);
+Iterator<Row> rowIterator = sheet.iterator();
+while (rowIterator.hasNext())
+            {
+                Row row = rowIterator.next();
+                //For each row, iterate through all the columns
+                Iterator<Cell> cellIterator = row.cellIterator();
+
+                while (cellIterator.hasNext())
+                {
+                    Cell cell = cellIterator.next();
+                    //Check the cell type and format accordingly
+                    switch (cell.getCellType())
+                    {
+                        case Cell.CELL_TYPE_NUMERIC:
+                            System.out.print(cell.getNumericCellValue() + "t");
+                            break;
+                        case Cell.CELL_TYPE_STRING:
+                            System.out.print(cell.getStringCellValue() + "t");
+                            break;
+                    }
+                }
+                System.out.println("");
+            }
+            file.close();
+]
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Framwork Explaination:
+
+1) Test Class : this class is extending to TestFundamentalClass
+
+//code
+public class DetailScreenTest extends TestFundamentals {
+
+        test.createAndConfigPage.logAsAdmin("qaadmin", "Cengage1");
+
+}
+
+2) TestFundamentals:
+
+public class TestFundamentals {
+
+@BeforeClass
+public void start_test_session(){
+
+	test = new TestSessionInitiator();
+	base_url = getData("base_url");
+	test.launchApplication(base_url);
+
+}}
+
+3) TestSessionInitiator:
+
+public TestSessionInitiator(){
+wdfactory = new WebDriverFactory();
+configBrowsewr(); //driver initilaization
+}
+
+4) Action Class
+
+public class CreateNotificationActions extends GetPage {
+
+}
+
+
+
+
+
+
+
+

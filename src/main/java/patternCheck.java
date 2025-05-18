@@ -4,7 +4,6 @@ public class patternCheck {
 
     public static void main(String[] args) {
 
-
         String arrayList[] ={"badc","abab","dddd","dede","yyxx"};
         String pattern = "abab";
 
@@ -25,9 +24,7 @@ public class patternCheck {
             if(!hm.containsKey(ch)) {
                 hm.put(ch, index++);
             }
-
             output.append(hm.get(ch)+"");
-
         }
         return output.toString().trim();
     }
